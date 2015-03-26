@@ -13,8 +13,8 @@
 GEOIP_DIST_URL="https://github.com/maxmind/geoip-api-c/releases/download/v1.6.0/GeoIP-1.6.0.tar.gz"
 GEOIP_DIST_DIR="GeoIP-1.6.0"
 
-GEOLITECITY_URL="http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz"
-GEOLITECITY_FILE="GeoLiteCity.dat"
+GEOLITECITY_URL="http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz"
+GEOLITECITY_FILE="GeoIP.dat"
 
 # Syntax sugar.
 source $BIN_DIR/utils
