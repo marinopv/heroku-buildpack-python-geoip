@@ -60,14 +60,8 @@ APP_DIR='/app'
 TMP_APP_DIR=$CACHE_DIR/tmp_app_dir
 
 # Copy Anvil app dir to temporary storage...
-bpwatch start anvil_appdir_stage
-  if [ "$SLUG_ID" ]; then
-    mkdir -p $TMP_APP_DIR
-    deep-mv $APP_DIR $TMP_APP_DIR
-  else
-    deep-rm $APP_DIR
-  fi
-bpwatch stop anvil_appdir_stage
+mkdir -p $TMP_APP_DIR
+deep-mv $APP_DIR $TMP_APP_DIR
 
 # Copy Application code in.
 bpwatch start appdir_stage
