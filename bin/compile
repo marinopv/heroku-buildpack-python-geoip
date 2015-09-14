@@ -94,6 +94,7 @@ cd $BUILD_DIR
 echo '5'
 # Experimental pre_compile hook.
 bpwatch start pre_compile
+  echo '5a'
   source $BIN_DIR/steps/hooks/pre_compile
 bpwatch stop pre_compile
 echo '6'

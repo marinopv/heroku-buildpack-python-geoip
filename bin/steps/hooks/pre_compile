@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+echo 'pre_compile'
 if [ -f bin/pre_compile ]; then
     echo "-----> Running pre-compile hook"
     chmod +x bin/pre_compile
