@@ -42,11 +42,11 @@ BUILDPACK_VERSION=v28
 # Sanitizing environment variables.
 unset GIT_DIR PYTHONHOME PYTHONPATH LD_LIBRARY_PATH LIBRARY_PATH
 
-bpwatch init $LOGPLEX_KEY
-bpwatch build python $BUILDPACK_VERSION $REQUEST_ID
+#bpwatch init $LOGPLEX_KEY
+#bpwatch build python $BUILDPACK_VERSION $REQUEST_ID
 TMP_APP_DIR=$CACHE_DIR/tmp_app_dir
 
-bpwatch start compile
+#bpwatch start compile
 
 echo '1'
 # We'll need to send these statics to other scripts we `source`.
@@ -61,19 +61,19 @@ APP_DIR='/app'
 TMP_APP_DIR=$CACHE_DIR/tmp_app_dir
 
 # Copy Anvil app dir to temporary storage...
-bpwatch start anvil_appdir_stage
+#bpwatch start anvil_appdir_stage
   if [ "$SLUG_ID" ]; then
     mkdir -p $TMP_APP_DIR
     deep-mv $APP_DIR $TMP_APP_DIR
   else
     deep-rm $APP_DIR
   fi
-bpwatch stop anvil_appdir_stage
+#bpwatch stop anvil_appdir_stage
 echo '3'
 # Copy Application code in.
-bpwatch start appdir_stage
+#bpwatch start appdir_stage
   deep-mv $BUILD_DIR $APP_DIR
-bpwatch stop appdir_stage
+#bpwatch stop appdir_stage
 
 # Set new context.
 ORIG_BUILD_DIR=$BUILD_DIR
@@ -93,7 +93,10 @@ echo '4'
 cd $BUILD_DIR
 echo '5'
 # Experimental pre_compile hook.
-
+#bpwatch start pre_compile
+  echo '5a'
+  source $BIN_DIR/steps/hooks/pre_compile
+#bpwatch stop pre_compile
 echo '6'
 # If no requirements given, assume `setup.py develop`.
 if [ ! -f requirements.txt ]; then
@@ -116,17 +119,17 @@ echo '9'
 mkdir -p $CACHE_DIR
 echo '10'
 # Purge "old-style" virtualenvs.
-bpwatch start clear_old_venvs
+#bpwatch start clear_old_venvs
   [ -d $CACHE_DIR/$LEGACY_TRIGGER ] && rm -fr $CACHE_DIR/.heroku/bin $CACHE_DIR/.heroku/lib $CACHE_DIR/.heroku/include
   [ -d $CACHE_DIR/$VIRTUALENV_LOC ] && rm -fr $CACHE_DIR/.heroku/venv $CACHE_DIR/.heroku/src
-bpwatch stop clear_old_venvs
+#bpwatch stop clear_old_venvs
 echo '11'
 # Restore old artifacts from the cache.
-bpwatch start restore_cache
+#bpwatch start restore_cache
   for dir in $CACHED_DIRS; do
     cp -R $CACHE_DIR/$dir . &> /dev/null || true
   done
-bpwatch stop restore_cache
+#bpwatch stop restore_cache
 echo '12'
 set +e
 # Create set-aside `.heroku` folder.
@@ -202,15 +205,15 @@ hash -r
 echo '19'
 # Pylibmc support.
 # See [`bin/steps/pylibmc`](pylibmc.html).
-bpwatch start pylibmc_install
+#bpwatch start pylibmc_install
   source $BIN_DIR/steps/pylibmc
-bpwatch stop pylibmc_install
+#bpwatch stop pylibmc_install
 
 # Maxmind GeoIP C Library support.
 # See [`bin/steps/geoip`](geoip.html).
-bpwatch start geoip_install
+#bpwatch start geoip_install
   source $BIN_DIR/steps/geoip
-bpwatch stop geoip_install
+#bpwatch stop geoip_install
 
 # Install Mercurial if it appears to be required.
 if (grep -Fiq "hg+" requirements.txt) then
@@ -232,9 +235,9 @@ puts-step "Installing dependencies using Pip ($PIP_VERSION)"
 [ "$FRESH_PYTHON" ] && bpwatch stop pip_install_first
 
 # Django collectstatic support.
-bpwatch start collectstatic
+#bpwatch start collectstatic
   sub-env $BIN_DIR/steps/collectstatic
-bpwatch stop collectstatic
+#bpwatch stop collectstatic
 
 # ### Finalize
 #
@@ -251,27 +254,27 @@ set-default-env PYTHONPATH /app/
 
 
 # Experimental post_compile hook.
-bpwatch start post_compile
+#bpwatch start post_compile
   source $BIN_DIR/steps/hooks/post_compile
-bpwatch stop post_compile
+#bpwatch stop post_compile
 
 # Store new artifacts in cache.
-bpwatch start dump_cache
+#bpwatch start dump_cache
   for dir in $CACHED_DIRS; do
     rm -rf $CACHE_DIR/$dir
     cp -R $dir $CACHE_DIR/
   done
-bpwatch stop dump_cache
+#bpwatch stop dump_cache
 
 # ### Fin.
-bpwatch start appdir_commit
+#bpwatch start appdir_commit
   deep-mv $BUILD_DIR $ORIG_BUILD_DIR
-bpwatch stop appdir_commit
+#bpwatch stop appdir_commit
 
-bpwatch start anvil_appdir_commit
+#bpwatch start anvil_appdir_commit
   if [ "$SLUG_ID" ]; then
     deep-mv $TMP_APP_DIR $APP_DIR
   fi
 
-bpwatch stop anvil_appdir_commit
-bpwatch stop compile
+#bpwatch stop anvil_appdir_commit
+#bpwatch stop compile
