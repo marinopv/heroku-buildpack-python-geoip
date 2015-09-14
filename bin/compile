@@ -48,13 +48,14 @@ TMP_APP_DIR=$CACHE_DIR/tmp_app_dir
 
 bpwatch start compile
 
-
+echo '1'
 # We'll need to send these statics to other scripts we `source`.
 export BUILD_DIR CACHE_DIR BIN_DIR PROFILE_PATH
 
 # Syntax sugar.
 source $BIN_DIR/utils
 
+echo '2'
 # Directory Hacks for path consistiency.
 APP_DIR='/app'
 TMP_APP_DIR=$CACHE_DIR/tmp_app_dir
@@ -68,7 +69,7 @@ bpwatch start anvil_appdir_stage
     deep-rm $APP_DIR
   fi
 bpwatch stop anvil_appdir_stage
-
+echo '3'
 # Copy Application code in.
 bpwatch start appdir_stage
   deep-mv $BUILD_DIR $APP_DIR
@@ -87,58 +88,58 @@ export CPLUS_INCLUDE_PATH=/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/
 export LIBRARY_PATH=/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib
 export LD_LIBRARY_PATH=/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib
 export PKG_CONFIG_PATH=/app/.heroku/vendor/lib/pkg-config:$BUILD_DIR/.heroku/vendor/lib/pkg-config
-
+echo '4'
 # Switch to the repo's context.
 cd $BUILD_DIR
-
+echo '5'
 # Experimental pre_compile hook.
 bpwatch start pre_compile
   source $BIN_DIR/steps/hooks/pre_compile
 bpwatch stop pre_compile
-
+echo '6'
 # If no requirements given, assume `setup.py develop`.
 if [ ! -f requirements.txt ]; then
   puts-step "No requirements.txt provided; assuming dist package."
   echo "-e ." > requirements.txt
 fi
-
+echo '7'
 # Sticky runtimes.
 if [ -f $CACHE_DIR/.heroku/python-version ]; then
   DEFAULT_PYTHON_VERSION=$(cat $CACHE_DIR/.heroku/python-version)
 fi
-
+echo '8'
 # If no runtime given, assume default version.
 if [ ! -f runtime.txt ]; then
   puts-step "No runtime.txt provided; assuming $DEFAULT_PYTHON_VERSION."
   echo $DEFAULT_PYTHON_VERSION > runtime.txt
 fi
-
+echo '9'
 # ### The Cache
 mkdir -p $CACHE_DIR
-
+echo '10'
 # Purge "old-style" virtualenvs.
 bpwatch start clear_old_venvs
   [ -d $CACHE_DIR/$LEGACY_TRIGGER ] && rm -fr $CACHE_DIR/.heroku/bin $CACHE_DIR/.heroku/lib $CACHE_DIR/.heroku/include
   [ -d $CACHE_DIR/$VIRTUALENV_LOC ] && rm -fr $CACHE_DIR/.heroku/venv $CACHE_DIR/.heroku/src
 bpwatch stop clear_old_venvs
-
+echo '11'
 # Restore old artifacts from the cache.
 bpwatch start restore_cache
   for dir in $CACHED_DIRS; do
     cp -R $CACHE_DIR/$dir . &> /dev/null || true
   done
 bpwatch stop restore_cache
-
+echo '12'
 set +e
 # Create set-aside `.heroku` folder.
 mkdir .heroku &> /dev/null
 set -e
-
+echo '13'
 mkdir -p $(dirname $PROFILE_PATH)
 
 set +e
 PYTHON_VERSION=$(cat runtime.txt)
-
+echo '14'
 # Install Python.
 if [ -f .heroku/python-version ]; then
   if [ ! $(cat .heroku/python-version) = $PYTHON_VERSION ]; then
@@ -150,7 +151,7 @@ if [ -f .heroku/python-version ]; then
     SKIP_INSTALL=1
   fi
 fi
-
+echo '15'
 
 if [ ! "$SKIP_INSTALL" ]; then
   bpwatch start install_python
@@ -172,7 +173,7 @@ if [ ! "$SKIP_INSTALL" ]; then
 else
   puts-step "Using Python runtime ($PYTHON_VERSION)"
 fi
-
+echo '16'
 # If Pip isn't up to date:
 if [ "$FRESH_PYTHON" ] || [[ ! $(pip --version) == *$PIP_VERSION* ]]; then
   WORKING_DIR=$(pwd)
@@ -196,10 +197,11 @@ if [ "$FRESH_PYTHON" ] || [[ ! $(pip --version) == *$PIP_VERSION* ]]; then
   bpwatch stop install_pip
   bpwatch stop prepare_environment
 fi
-
+echo '17'
 set -e
+echo '18'
 hash -r
-
+echo '19'
 # Pylibmc support.
 # See [`bin/steps/pylibmc`](pylibmc.html).
 bpwatch start pylibmc_install
