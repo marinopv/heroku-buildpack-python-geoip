@@ -25,16 +25,21 @@ if [ ! -d "$CACHE_DIR/.geoip" ]; then
 fi
 
 cd $CACHE_DIR/.geoip
-
+echo 'g1'
 curl -s -L -o geoip.tar.gz $GEOIP_DIST_URL
 tar -zxvf geoip.tar.gz > /dev/null
+echo 'g2'
 cd $GEOIP_DIST_DIR
+echo 'g3'
 ./configure --prefix=$BUILD_DIR/.heroku/vendor > /dev/null
+echo 'g4'
 make install > /dev/null
-
+echo 'g5'
 cd $BUILD_DIR
 if [ ! -f $GEOLITECITY_FILE ]; then
+	echo 'g6'
     curl -s -L -o ${GEOLITECITY_FILE}.gz $GEOLITECITY_URL
+    echo 'g7'
     gunzip ${GEOLITECITY_FILE}.gz > /dev/null
 fi
 echo "       GeoIP City Database is available at: $(pwd)/${GEOLITECITY_FILE}"
